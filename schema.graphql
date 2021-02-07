@@ -1,0 +1,84 @@
+enum ProjectState {
+    None
+    New
+    Presale
+    InProgress
+    Finished
+    Canceled
+}
+
+enum VoteType {
+    None
+    No
+    Yes
+}
+
+enum VoteResult {
+    None
+    Negative
+    Positive
+}
+
+type Project @entity {
+    # project address
+    id: ID!
+
+    owner: ID!
+    projectName: String!
+    tokenName: String!
+    symbol: String!
+    decimal: Int!
+
+    state: ProjectState!
+    firstSeason: FirstSeason! @derivedFrom(field: "project")
+}
+
+type FirstSeason @entity {
+    # {project + -1}
+    id: ID!
+    presale: TokenFirstPresale! @derivedFrom(field: "firstSeason")
+    activeSeries: Int!
+    stakePercentsLeft: Int!
+    series: [Series!]! @derivedFrom(field: "season")
+    project: Project!
+}
+
+type TokenFirstPresale @entity {
+    # {project + -1 + Presale}
+    id: ID!
+    ownerPercent: Int!
+    price: BigInt!
+    start: BigInt!
+    duration: BigInt!
+    totalGenerated: BigInt!
+    minCap: BigInt!
+    firstSeason: FirstSeason!
+}
+
+type Series implements VoteHolder @entity {
+    # {project + indexOfSeries}
+    id: ID!
+    start: BigInt!
+    duration: BigInt!
+    stakeUnlock: Int!
+    season: FirstSeason!
+    vote: Voting @derivedFrom(field: "event")
+}
+
+interface VoteHolder {
+    id: ID!
+    vote: Voting @derivedFrom(field: "event")
+}
+
+type Voting @entity {
+    id: ID!
+
+    timestampStart: BigInt!
+    blockStart: BigInt!
+    totalYes: BigInt!
+    totalNo: BigInt!
+    totalSupply: BigInt!
+    result: VoteResult!
+
+    event: VoteHolder!
+}

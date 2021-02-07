@@ -1,0 +1,44 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Contract
+    network: kovan
+    source:
+      address: "0x5df615ff30A3433F7E814c0af46af1625CfD548b"
+      abi: Contract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - FinishVoting
+        - Invest
+        - ProjectCreated
+        - ProjectUpdateNextSeason
+        - StartVoting
+        - StateUpdate
+        - VoteRecord
+        - VotingCreated
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: FinishVoting(indexed address,indexed uint8,uint256,uint256)
+          handler: handleFinishVoting
+        - event: Invest(indexed address,indexed address,indexed uint256,uint256)
+          handler: handleInvest
+        - event: ProjectCreated(indexed address,indexed address,string,string,string,uint8,((uint8,uint256,uint64,uint64,uint256,uint256),int8,uint8,(uint64,uint64,uint8,address)[]))
+          handler: handleProjectCreated
+        - event: ProjectUpdateNextSeason(indexed address,uint8,(address,(uint256,uint64,uint8,uint64,uint64,uint64,uint64,uint256),int8,uint8,(uint64,uint64,uint8,address)[]))
+          handler: handleProjectUpdateNextSeason
+        - event: StartVoting(indexed address,uint64,uint256,uint256)
+          handler: handleStartVoting
+        - event: StateUpdate(indexed address,indexed uint8)
+          handler: handleStateUpdate
+        - event: VoteRecord(indexed address,indexed address,indexed uint8,uint256)
+          handler: handleVoteRecord
+        - event: VotingCreated(indexed address,(uint64,(uint8,uint64)[]))
+          handler: handleVotingCreated
+      file: ./src/mapping.ts
